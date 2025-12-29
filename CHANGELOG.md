@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v2.0.0 (2025-12-29)
+
+### Bug Fixes
+
+- Bump minimum Python version to 3.9 for filelock compatibility
+  ([#19](https://github.com/rfgamaral/PlexMusicRatingsSync/pull/19),
+  [`a9fca7c`](https://github.com/rfgamaral/PlexMusicRatingsSync/commit/a9fca7ce74433a2988e2651326f2b96367688196))
+
+filelock 3.17.0 requires Python >=3.9
+
+### Chores
+
+- **deps**: Bump Python to 3.9 ([#19](https://github.com/rfgamaral/PlexMusicRatingsSync/pull/19),
+  [`a9fca7c`](https://github.com/rfgamaral/PlexMusicRatingsSync/commit/a9fca7ce74433a2988e2651326f2b96367688196))
+
+
 ## v1.2.0 (2025-12-29)
 
 ### Features
