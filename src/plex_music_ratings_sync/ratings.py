@@ -1,3 +1,4 @@
+from mutagen.aiff import AIFF
 from mutagen.flac import FLAC
 from mutagen.id3 import ID3, POPM
 from mutagen.mp3 import MP3
@@ -48,6 +49,12 @@ _KNOWN_PRIMARY_RATING_PLAYERS = [
 """
 Email identifiers for players known to use the primary rating map with half-star
 support.
+"""
+
+_AIFF_FORMATS = {".aif": "AIFF", ".aiff": "AIFF"}
+"""
+Maps file extensions to their format names for AIFF audio files that use ID3 tags for
+metadata storage.
 """
 
 _VORBIS_FORMATS = {".flac": "FLAC", ".ogg": "OGG", ".opus": "OPUS"}
@@ -173,6 +180,80 @@ def _set_rating_to_mp3(file_path, plex_rating):
             log_info(f"▸ Successfully rated MP3 file: {log_rating}", 4)
     except Exception as e:
         log_error(f"▪ Failed to write rating for MP3 file: {e}", 4)
+
+
+def _get_rating_from_aiff(file_path):
+    """
+    Read rating from an AIFF file's POPM tag. Attempts to read the rating from a Plex
+    POPM tag first, falling back to other POPM tags if no Plex tag is found. Converts
+    the rating to Plex's 1-10 scale.
+    """
+    try:
+        audio = AIFF(file_path)
+
+        if audio.tags:
+            popm_frames = audio.tags.getall("POPM")
+
+            if popm_frames:
+                plex_popm = next(
+                    (frame for frame in popm_frames if frame.email == "Plex"), None
+                )
+
+                if plex_popm:
+                    rating = _popm_rating_to_plex(plex_popm.rating, "Plex")
+                else:
+                    frame = popm_frames[0]
+                    rating = _popm_rating_to_plex(frame.rating, frame.email)
+
+                log_debug(f"▸ Successfully read AIFF rating: **{rating}**", 4)
+
+                return rating
+
+        log_debug("▸ No rating found in AIFF file", 4)
+
+        return None
+    except Exception as e:
+        log_error(f"▪ Failed to read rating from AIFF file: {e}", 4)
+        return None
+
+
+def _set_rating_to_aiff(file_path, plex_rating):
+    """
+    Write rating to an AIFF file's POPM tag. Creates or updates a Plex POPM tag with the
+    provided rating value converted to the appropriate POPM scale.
+    """
+    try:
+        popm_rating = _plex_rating_to_popm(plex_rating)
+
+        log_rating = f"**{plex_rating}** (**{plex_rating / 2}**) ⇒ **{popm_rating}**"
+
+        if is_dry_run():
+            log_info(
+                f"▸ [dry-run] Would have rated AIFF file: {log_rating}",
+                4,
+            )
+        else:
+            audio = AIFF(file_path)
+
+            if audio.tags is None:
+                audio.add_tags()
+
+            popm_frames = audio.tags.getall("POPM")
+            plex_popm = next(
+                (frame for frame in popm_frames if frame.email == "Plex"), None
+            )
+
+            if plex_popm:
+                plex_popm.rating = popm_rating
+                plex_popm.count = 0
+            else:
+                audio.tags.add(POPM(email="Plex", rating=popm_rating, count=0))
+
+            audio.save()
+
+            log_info(f"▸ Successfully rated AIFF file: {log_rating}", 4)
+    except Exception as e:
+        log_error(f"▪ Failed to write rating for AIFF file: {e}", 4)
 
 
 def _get_rating_from_vorbis(file_path, file_type):
@@ -316,6 +397,10 @@ def get_rating_from_file(file_path):
     if file_path.endswith(".m4a"):
         return _get_rating_from_m4a(file_path)
 
+    for ext, file_type in _AIFF_FORMATS.items():
+        if file_path.endswith(ext):
+            return _get_rating_from_aiff(file_path)
+
     for ext, file_type in _VORBIS_FORMATS.items():
         if file_path.endswith(ext):
             return _get_rating_from_vorbis(file_path, file_type)
@@ -333,6 +418,10 @@ def set_rating_to_file(file_path, plex_rating):
 
     if file_path.endswith(".m4a"):
         _set_rating_to_m4a(file_path, plex_rating)
+
+    for ext, file_type in _AIFF_FORMATS.items():
+        if file_path.endswith(ext):
+            _set_rating_to_aiff(file_path, plex_rating)
 
     for ext, file_type in _VORBIS_FORMATS.items():
         if file_path.endswith(ext):
