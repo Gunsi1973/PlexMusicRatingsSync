@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v1.2.0 (2025-12-29)
+
+### Features
+
+- Add AIFF support ([#15](https://github.com/rfgamaral/PlexMusicRatingsSync/pull/15),
+  [`6cf6ccc`](https://github.com/rfgamaral/PlexMusicRatingsSync/commit/6cf6ccce57114046160f60fde1b54808e7f94dd8))
+
+
 ## v1.1.3 (2025-02-17)
 
 ### Bug Fixes
