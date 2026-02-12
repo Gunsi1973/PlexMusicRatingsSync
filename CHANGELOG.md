@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## v.2.1.1
+ - Addded docker friendly stuff (.env file support)
+ - changed colors in logging (black on black not optimal)
+
 ## v.2.1.0 (2026-02-12)
 - Added caching mechanism
 - changed logs so a summary is made after the sync

@@ -121,7 +121,7 @@ class RatingSync:
 
         # Standard log (level 3 = verbose/debug usually)
         log_info(
-            f"Track: **{track_index:02d}. {item.title}** __({file_path.name})__",
+            f"Track: **{track_index:02d}. {item.title}** ({file_path.name})",
             3,
         )
 
