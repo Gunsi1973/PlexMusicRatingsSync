@@ -1,5 +1,8 @@
 # CHANGELOG
-
+## v.2.1.0 (2026-02-12)
+- Added caching mechanism
+- changed logs so a summary is made after the sync
+- (only changed sync yet, should work for import/export as well, not tested yet)
 
 ## v2.0.0 (2025-12-29)
 
