@@ -4,6 +4,7 @@ from shutil import copyfile
 
 import yaml
 
+# Wir importieren log_error/log_info zwar, nutzen sie aber nur da, wo es sicher ist
 from plex_music_ratings_sync.logger import log_error, log_info
 from plex_music_ratings_sync.util.paths import (
     get_config_dir,
@@ -23,7 +24,7 @@ def _create_config(config_file_path):
 
 
 def init_config():
-    """Initialize the configuration by loading ENV vars or parsing the YAML config file."""
+    """Initialize the configuration by checking Env Vars first, then falling back to YAML config file."""
     global _config
 
     # --- STRATEGY 1: Environment Variables (Docker Friendly) ---
@@ -32,7 +33,8 @@ def init_config():
     plex_libraries = os.getenv('PLEX_LIBRARIES') # Expected format: "Music,Audiobooks"
 
     if plex_url and plex_token:
-        log_info("Configuration detected in Environment Variables. Skipping config file.")
+        # WICHTIG: Hier print() statt log_info() nutzen, da der Logger noch nicht existiert!
+        print("INFO: Configuration detected in Environment Variables. Skipping config file.")
         
         # Parse libraries from comma-separated string to list
         libraries_list = []
@@ -68,8 +70,8 @@ def init_config():
 def get_plex_config():
     """Retrieve the Plex configuration."""
     if _config is None:
-        # Safety check if init_config wasn't called
-        log_error("Configuration not initialized.")
+        # Hier ist print() auch sicherer, falls logger noch tot ist, aber log_error könnte gehen
+        print("ERROR: Configuration not initialized.") 
         sys.exit(1)
 
     plex_config = _config.get("plex", {})
@@ -77,7 +79,8 @@ def get_plex_config():
     if not isinstance(plex_config.get("url"), str) or not isinstance(
         plex_config.get("token"), str
     ):
-        log_error("The Plex configuration is not valid")
+        # Hier können wir log_error probieren, aber print ist sicherer beim Start
+        print("ERROR: The Plex configuration is not valid")
         sys.exit(1)
 
     return plex_config
