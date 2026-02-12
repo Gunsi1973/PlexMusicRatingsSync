@@ -36,3 +36,5 @@ ENV/
 # Local development settings
 *.log
 .env.local
+.env
+

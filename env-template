@@ -1,0 +1,22 @@
+# Rename to .env for docker deployment
+
+# --- PLEX CONFIG ---
+PLEX_URL=<your-ip-or-host>:32400
+PLEX_TOKEN=<your-plex-token>
+PLEX_LIBRARIES=Music, Audiobooks
+
+# --- PATHS (HOST) ---
+# Location of the music on your PC/Server/NAS
+HOST_MUSIC_PATH=/mnt/medien/music #example path
+# Location where cache data should be stored
+HOST_DATA_PATH=/container/plexsync/config #example path
+
+# --- PATHS (CONTAINER) ---
+# IMPORTANT: This path must match exactly how Plex sees the folder!
+# If Plex accesses the music at /medien-new/music, this must be set here.
+CONTAINER_MUSIC_PATH=/medien-new/music #example path
+
+# --- SYSTEM ---
+TZ=Europe/Zurich
+PUID=0
+PGID=0

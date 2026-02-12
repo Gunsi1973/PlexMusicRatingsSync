@@ -1,0 +1,25 @@
+services:
+  plex-music-ratings-sync:
+    build: .
+    container_name: plex-music-ratings-sync
+    
+    # Loads all variables from the .env file into the container
+    env_file:
+      - .env
+      
+    volumes:
+      # Music Mapping (Host : Container)
+      - ${HOST_MUSIC_PATH}:${CONTAINER_MUSIC_PATH}:rw
+      
+      # Data Mapping (Cache & Configs)
+      # Mapping to /app/data, as the script now looks there via fallback or Env logic
+      - ${HOST_DATA_PATH}:/app/data
+
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      # PLEX_URL etc. are automatically injected via 'env_file',
+      # no need to duplicate them here.
+
+    restart: no
